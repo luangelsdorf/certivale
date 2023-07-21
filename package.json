@@ -9,8 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.8",
+    "@fullcalendar/daygrid": "^6.1.8",
+    "@fullcalendar/interaction": "^6.1.8",
+    "@fullcalendar/react": "^6.1.8",
+    "bootstrap": "^4.3.1",
     "next": "13.4.9",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-bootstrap": "^1.6.7",
+    "react-dom": "18.2.0",
+    "sass": "^1.63.6",
+    "sweetalert2": "^11.6.13",
+    "sweetalert2-react-content": "^5.0.7"
   }
 }
