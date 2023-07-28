@@ -1,34 +1,38 @@
+body {
+  font-family: inherit;
+}
+
 iframe {
-    border: 0;
+  border: 0;
 }
 
 figcaption,
 figure,
 main {
-    display: block;
-    margin: 0;
+  display: block;
+  margin: 0;
 }
 
 figure {
-    max-width: 100%;
-    min-height: 1px;
+  max-width: 100%;
+  min-height: 1px;
 }
 
 main {
-    position: relative;
+  position: relative;
 }
 
 button:focus {
-    outline: none;
+  outline: none;
 }
 
 svg {
-    vertical-align: middle;
-    overflow: hidden;
+  vertical-align: middle;
+  overflow: hidden;
 }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-    img[src$=".svg"] {
-        width: 100%;
-    }
+  img[src$=".svg"] {
+    width: 100%;
+  }
 }
