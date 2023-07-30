@@ -13,6 +13,7 @@
     "@fullcalendar/daygrid": "^6.1.8",
     "@fullcalendar/interaction": "^6.1.8",
     "@fullcalendar/react": "^6.1.8",
+    "@svgr/webpack": "^8.0.1",
     "bootstrap": "^4.3.1",
     "next": "13.4.9",
     "next-auth": "^4.22.3",
