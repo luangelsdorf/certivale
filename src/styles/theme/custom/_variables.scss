@@ -3,6 +3,12 @@
 // Variables should follow the `$component-state-property-size` formula for
 // consistent naming. Ex: $nav-link-disabled-color and $modal-content-box-shadow-xs.
 
+// => Application (layout)
+$application-container-bg-height: 390px;
+$application-container-bg-color: #0e1530;
+$application-container-border-radius: 0;
+
+// => Colors
 $sky-blue: #0086ff;
 $deep-blue: #0e1530;
 $catskill-white: #EFF3FB;
@@ -12,8 +18,11 @@ $theme-colors: (
   "dark": $deep-blue,
   "info": #6e00ff
 );
-
 $body-bg: $catskill-white;
+
+// => Typography
+$font-weight-bold: 400;
+$font-weight-bolder: 400;
 
 // Skins
 //

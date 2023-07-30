@@ -15,7 +15,9 @@ export default function App({ Component, pageProps: { session, ...pageProps } })
       `}</style>
 
       <SessionProvider session={session}>
-        <Component {...pageProps} />
+        <div className="container-fluid container-application">
+          <Component {...pageProps} />
+        </div>
       </SessionProvider>
     </>
   )

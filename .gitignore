@@ -32,6 +32,7 @@ yarn-error.log*
 .vercel
 src/pages/components.js
 src/pages/styleguide.js
+src/pages/index.js
 
 # typescript
 *.tsbuildinfo

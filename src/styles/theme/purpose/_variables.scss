@@ -1144,6 +1144,6 @@ $footer-rotate-bg:                  str-replace(url("data:image/svg+xml;charset=
 
 // Application specifics
 
-$application-container-bg-height:      430px;
-$application-container-bg-color:       theme-color("primary");
-$application-container-border-radius:  2.5rem;
+$application-container-bg-height:      430px !default;
+$application-container-bg-color:       theme-color("primary") !default;
+$application-container-border-radius:  2.5rem !default;
