@@ -11,11 +11,11 @@ Copyright 2013-2019 Webpixels
 
 */
 
-// Bootstrap functions
-@import '../../../node_modules/bootstrap/scss/functions';
-
 // Custom variables
 @import "custom/variables";
+
+// Bootstrap functions
+@import '../../../node_modules/bootstrap/scss/functions';
 
 // Purpose functions
 @import "purpose/functions";
