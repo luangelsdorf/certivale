@@ -3,6 +3,15 @@
 // This is the place where you should place all additional styles and imports.
 // This will allow you to take advantage of future updates with lower time consumed on the upgrade process.
 
+//
+// ==> em classes for icons
+//
+@for $i from 1 through 10 {
+  .fs-#{$i}x {
+    font-size: #{$i}em;
+  }
+}
+
 // => Application Layout
 .application {
   opacity: 1;
@@ -30,7 +39,20 @@
   font-weight: 400;
 }
 
+.btn-inner--icon {
+  & > svg {
+    width: 1em;
+    height: 1em;
+  }
+}
+
 // => Navbar
 .navbar-nav .nav-link {
   font-weight: 400;
+}
+.nav-application {
+  & > .btn {
+    width: (($navbar-vertical-open-width / 2) - 12) !important;
+    height: (($navbar-vertical-open-width / 2) - 12) !important;
+  }
 }
