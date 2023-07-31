@@ -6,6 +6,23 @@
 // => Application Layout
 .application {
   opacity: 1;
+
+  .sidenav-header {
+    padding: 2rem 0;
+    & > a {
+      display: inline-flex;
+    }
+  }
+
+  .sidenav-user {
+    height: auto;
+    gap: 48px;
+  }
+}
+
+// => Actions
+.action-item {
+  display: inline-flex;
 }
 
 // => Buttons
