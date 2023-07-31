@@ -1,11 +1,12 @@
 /* import 'bootstrap/dist/css/bootstrap.css'; */
 import 'src/styles/theme/purpose.scss';
 import localFont from 'next/font/local';
-import { SessionProvider } from 'next-auth/react';
+/* import { SessionProvider } from 'next-auth/react'; */
+import MainLayout from '@/components/layout/Main';
 
 const REM = localFont({ src: '../../public/fonts/REM.ttf' });
 
-export default function App({ Component, pageProps: { session, ...pageProps } }) {
+export default function App({ Component, pageProps }) {
   return (
     <>
       <style jsx global>{`
@@ -14,11 +15,11 @@ export default function App({ Component, pageProps: { session, ...pageProps } })
         }
       `}</style>
 
-      <SessionProvider session={session}>
-        <div className="container-fluid container-application">
-          <Component {...pageProps} />
-        </div>
-      </SessionProvider>
+      {/* <SessionProvider session={session}> */}
+      <MainLayout>
+        <Component {...pageProps} />
+      </MainLayout>
+      {/* </SessionProvider> */}
     </>
   )
 }
