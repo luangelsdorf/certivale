@@ -15,7 +15,7 @@ const nextConfig = {
           loader: '@svgr/webpack',
           options: {
             svgo: false,
-            svgProps: { fill: 'currentColor' }
+            svgProps: { fill: 'currentColor', width: '1em', height: '1em' }
           }
         }
       ],
