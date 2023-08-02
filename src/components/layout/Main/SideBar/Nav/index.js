@@ -12,32 +12,32 @@ export default function Nav({ content }) {
   const links = [
     {
       name: 'Agenda',
-      href: '/agenda',
+      href: '/agenda/dashboard',
       Icon: CalendarDay,
     },
     {
       name: 'Comercial',
-      href: '/comercial',
+      href: '/comercial/dashboard',
       Icon: Store,
     },
     {
       name: 'Financeiro',
-      href: '/financeiro',
+      href: '/financeiro/dashboard',
       Icon: CircleDollar,
     },
     {
       name: 'Parceiros',
-      href: 'parceiros',
+      href: '/parceiros/dashboard',
       Icon: Handshake,
     },
     {
       name: 'Administrativo',
-      href: 'administrativo',
+      href: '/administrativo/dashboard',
       Icon: Landmark,
     },
     {
       name: 'Diário',
-      href: 'diario',
+      href: '/diario/dashboard',
       Icon: BookUser,
     },
   ]
