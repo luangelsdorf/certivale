@@ -183,6 +183,41 @@
   }
 }
 
+.fc-timegrid {
+  thead {
+    .fc-scroller {
+      overflow: hidden !important;
+    }
+  }
+}
+
+.fc-timegrid-body {
+  thead {
+    .fc-scroller {
+      overflow: hidden !important;
+    }
+  }
+
+  .fc-timegrid-slot-minor {
+    &:first-child {
+      border: 0;
+    }
+  }
+
+  tr {
+    position: relative;
+  }
+
+  .fc-timegrid-slot-label {
+    &:not(.fc-timegrid-slot-minor) {
+      position: absolute;
+      top: calc(50% * 4);
+      transform: translateY(-50%);
+      border: 0;
+    }
+  }
+}
+
 // Widget
 
 .widget-calendar {
