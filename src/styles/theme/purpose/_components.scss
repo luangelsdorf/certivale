@@ -89,7 +89,7 @@
 /* @import "components/custom-forms/custom-file"; */
 /* @import "components/custom-forms/custom-switch"; */
 
-// Dropdown
+// Divider
 
 /* @import 'components/dividers/divider'; */
 /* @import 'components/dividers/divider-fade'; */
@@ -98,8 +98,8 @@
 
 // Dropdown
 
-/* @import 'components/dropdowns/dropdown'; */
-/* @import 'components/dropdowns/dropdown-submenu' */;
+@import 'components/dropdowns/dropdown';
+@import 'components/dropdowns/dropdown-submenu';
 /* @import 'components/dropdowns/dropdown-extend'; */
 
 // Footers
@@ -183,9 +183,9 @@
 
 // Navbars
 
-/* @import 'components/navbars/navbar'; */
+@import 'components/navbars/navbar';
 /* @import 'components/navbars/navbar-vertical'; */
-/* @import 'components/navbars/navbar-dropdown'; */
+@import 'components/navbars/navbar-dropdown';
 /* @import 'components/navbars/navbar-search'; */
 
 // Paginations

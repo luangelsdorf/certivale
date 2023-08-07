@@ -1,4 +1,5 @@
 import { SideBar } from "./SideBar";
+import { NavBar } from "./NavBar";
 
 export default function MainLayout({ children }) {
   return (
@@ -9,7 +10,7 @@ export default function MainLayout({ children }) {
         <SideBar.Nav />
       </SideBar>
       <div className="main-content position-relative">
-        <nav className="navbar" />
+        <NavBar />
         <div className="page-content">
           {children}
         </div>
