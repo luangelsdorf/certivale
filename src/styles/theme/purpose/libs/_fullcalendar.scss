@@ -7,6 +7,12 @@
   --fc-border-color: #{lighten($table-border-color, 2%)};
 }
 
+#calendar-title {
+  &::first-letter {
+    text-transform: uppercase;
+  }
+}
+
 .fc-header-toolbar {
   display: none;
 }
