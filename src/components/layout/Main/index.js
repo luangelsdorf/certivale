@@ -1,7 +1,7 @@
 import { SideBar } from "./SideBar";
 import { NavBar } from "./NavBar";
 
-export default function MainLayout({ children }) {
+export default function MainLayout({ children, pageTitle }) {
   return (
     <div className="container-fluid container-application">
       <SideBar>
@@ -12,6 +12,11 @@ export default function MainLayout({ children }) {
       <div className="main-content position-relative">
         <NavBar />
         <div className="page-content">
+          {
+            pageTitle && (
+              <div className="page-title">{pageTitle}</div>
+            )
+          }
           {children}
         </div>
       </div>

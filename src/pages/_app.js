@@ -1,7 +1,5 @@
-/* import 'bootstrap/dist/css/bootstrap.css'; */
 import 'src/styles/theme/purpose.scss';
 import localFont from 'next/font/local';
-/* import { SessionProvider } from 'next-auth/react'; */
 import MainLayout from '@/components/layout/Main';
 
 const REM = localFont({ src: '../../public/fonts/REM.ttf' });
@@ -15,11 +13,9 @@ export default function App({ Component, pageProps }) {
         }
       `}</style>
 
-      {/* <SessionProvider session={session}> */}
-      <MainLayout>
+      <MainLayout pageTitle={Component.Title}>
         <Component {...pageProps} />
       </MainLayout>
-      {/* </SessionProvider> */}
     </>
   )
 }
