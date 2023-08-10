@@ -12,17 +12,16 @@ import AngleLeft from '@icons/angle-left.svg';
 
 export default function AgendaDashBoard() {
   const fcRef = useRef(null);
-  const [title, setTitle] = useState('');
-
-  /* useEffect(() => setTitle(fcRef.current?.calendar.view.title), []); */
+  const [view, setView] = useState({});
 
   function handleNavigation({ currentTarget: { dataset } }) {
+    let fc = fcRef.current;
     if (dataset.calendarAction) {
-      fcRef.current?.getApi()[dataset.calendarAction]();
-      setTitle(fcRef.current?.calendar.view.title);
+      fc.getApi()[dataset.calendarAction]();
+      setView({ ...view, type: fc.calendar.view.type, title: fc.calendar.view.title, });
     }
     else if (dataset.calendarView) {
-      fcRef.current?.calendar.changeView(dataset.calendarView);
+      fc.calendar.changeView(dataset.calendarView);
     }
   }
 
@@ -38,21 +37,21 @@ export default function AgendaDashBoard() {
       <div className="page-title">
         <Row className="justify-content-between align-items-center">
           <Col className="d-flex align-items-center">
-            <h2 id="calendar-title" className="h4 d-inline-block mb-0 text-white">{title}</h2>
+            <h2 id="calendar-title" className="h4 d-inline-block mb-0 text-white">{view?.title}</h2>
           </Col>
           <Col lg="6" className="mt-3 mt-lg-0 text-lg-right">
             <ButtonGroup className="mr-lg-1">
               <Button data-calendar-action="prev" onClick={handleNavigation} size="sm" variant="neutral">
-                <AngleLeft />
+                <AngleLeft height="1em" />
               </Button>
               <Button data-calendar-action="next" onClick={handleNavigation} size="sm" variant="neutral">
-                <AngleRight />
+                <AngleRight height="1em" />
               </Button>
             </ButtonGroup>
             <ButtonGroup>
-              <Button data-calendar-view="dayGridMonth" onClick={handleNavigation} size="sm" variant="neutral">Mês</Button>
-              <Button data-calendar-view="timeGridWeek" onClick={handleNavigation} size="sm" variant="neutral">Semana</Button>
-              <Button data-calendar-view="listWeek" onClick={handleNavigation} size="sm" variant="neutral">Fechar</Button>
+              <Button className={view?.type === 'dayGridMonth' ? 'active' : undefined} data-calendar-view="dayGridMonth" onClick={handleNavigation} size="sm" variant="neutral">Mês</Button>
+              <Button className={view?.type === 'timeGridWeek' ? 'active' : undefined} data-calendar-view="timeGridWeek" onClick={handleNavigation} size="sm" variant="neutral">Semana</Button>
+              <Button className={view?.type === 'listWeek' ? 'active' : undefined} data-calendar-view="listWeek" onClick={handleNavigation} size="sm" variant="neutral">Fechar</Button>
             </ButtonGroup>
           </Col>
         </Row>
@@ -62,7 +61,7 @@ export default function AgendaDashBoard() {
         <Col>
           <Card>
             <FullCalendar
-              viewDidMount={({view}) => setTitle(view.title)}
+              viewDidMount={({ view: { title }, view: { type } }) => setView({ type, title })}
               ref={fcRef}
               plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
               weekends={false}
