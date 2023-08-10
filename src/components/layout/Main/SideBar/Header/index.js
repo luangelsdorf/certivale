@@ -6,7 +6,7 @@ export default function Header({ content }) {
   return (
     <div className="sidenav-header d-flex align-items-center">
       <Link href="/">
-        <Logo width="130" height="auto" className="navbar-brand-img" />
+        <Logo width="130" style={{ height: 'auto' }} className="navbar-brand-img" />
       </Link>
       <div className="ml-auto">
         <div className="sidenav-toggler sidenav-toggler-dark d-md-none" data-action="sidenav-unpin" data-target="#sidenav-main">

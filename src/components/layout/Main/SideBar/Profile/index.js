@@ -22,13 +22,13 @@ export default function Profile({ content }) {
       {/* Actions */}
       <div className="w-100 actions d-flex justify-content-between">
         <Link href="#clientes" className="action-item action-item-lg text-white pl-0">
-          <UserGroup height="20" width="auto" />
+          <UserGroup height="20" />
         </Link>
         <Link href="#relatorios" className="action-item action-item-lg text-white">
-          <BallotCheck height="20" width="auto" />
+          <BallotCheck height="20" />
         </Link>
         <Link href="#notas" className="action-item action-item-lg text-white pr-0">
-          <Receipt height="20" width="auto" />
+          <Receipt height="20" />
         </Link>
       </div>
     </div>
