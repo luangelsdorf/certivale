@@ -12,6 +12,11 @@
   }
 }
 
+/* svg {
+  width: 1em;
+  height: 1em;
+} */
+
 // => Application Layout
 .application {
   opacity: 1;
@@ -39,8 +44,8 @@
   font-weight: 400;
 }
 
-.btn-inner--icon {
-  & > svg {
+.btn, .nav-link {
+  svg {
     width: 1em;
     height: 1em;
   }

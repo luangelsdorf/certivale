@@ -10,7 +10,10 @@ export default function MainLayout({ children, pageTitle }) {
         <SideBar.Nav />
       </SideBar>
       <div className="main-content position-relative">
-        <NavBar />
+        <NavBar>
+          <NavBar.Navigation />
+          <NavBar.UserMenu />
+        </NavBar>
         <div className="page-content">
           {
             pageTitle && (
