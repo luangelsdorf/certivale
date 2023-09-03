@@ -9,7 +9,6 @@ const REM = localFont({ src: '../../public/fonts/REM.ttf' });
 export default function App({ Component, pageProps: { session, ...pageProps } }) {
 
   const router = useRouter();
-  console.log(router);
 
   return (
     <>
