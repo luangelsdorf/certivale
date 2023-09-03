@@ -2,10 +2,15 @@ import 'src/styles/theme/purpose.scss';
 import localFont from 'next/font/local';
 import MainLayout from '@/components/layout/Main';
 import { SessionProvider } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
 const REM = localFont({ src: '../../public/fonts/REM.ttf' });
 
 export default function App({ Component, pageProps: { session, ...pageProps } }) {
+
+  const router = useRouter();
+  console.log(router);
+
   return (
     <>
       <style jsx global>{`
@@ -15,9 +20,15 @@ export default function App({ Component, pageProps: { session, ...pageProps } })
       `}</style>
 
       <SessionProvider session={session}>
-        <MainLayout pageTitle={Component.Title}>
-          <Component {...pageProps} />
-        </MainLayout>
+        {
+          router.pathname === '/_error' || router.pathname === '/404' ? (
+            <Component {...pageProps} />
+          ) : (
+            <MainLayout pageTitle={Component.Title}>
+              <Component {...pageProps} />
+            </MainLayout>
+          )
+        }
       </SessionProvider>
     </>
   )
