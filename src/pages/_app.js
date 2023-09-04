@@ -18,7 +18,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } })
         }
       `}</style>
 
-      <SessionProvider session={session}>
+      <SessionProvider refetchOnWindowFocus={false} session={session}>
         {
           router.pathname === '/_error' || router.pathname === '/404' ? (
             <Component {...pageProps} />

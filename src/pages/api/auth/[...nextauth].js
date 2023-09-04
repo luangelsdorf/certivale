@@ -15,7 +15,7 @@ const authHandler = NextAuth({
       },
 
       async authorize({ user, password }, req) {
-        const res = await fetch(`${process.env.API_URL}/acesso/auth/login`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
           method: 'POST',
           body: JSON.stringify({ user, password }),
           headers: { "Content-Type": "application/json", "Accept": 'application/json' }
