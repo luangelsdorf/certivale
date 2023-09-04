@@ -5,7 +5,7 @@ import UserMenu from "./UserMenu";
 export function NavBar({ children }) {
   return (
     <>
-      <Navbar expand="lg" variant="dark" bg="dark" className="navbar-border">
+      <Navbar expand="lg" variant="dark" className="navbar-border">
         <Container fluid>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse className="navbar-collapse-fade">{children}</Navbar.Collapse>

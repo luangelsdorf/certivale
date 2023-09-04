@@ -42,9 +42,12 @@
 // => Buttons
 .btn {
   font-weight: 400;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.btn, .nav-link {
+.btn, .nav-link, .action-item {
   svg {
     width: 1em;
     height: 1em;
