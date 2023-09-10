@@ -1,4 +1,4 @@
-import { Dropdown, ListGroup, Nav } from 'react-bootstrap';
+import { Button, Dropdown, ListGroup, Nav } from 'react-bootstrap';
 import styles from './UserMenu.module.scss';
 import Bars from '@icons/bars.svg';
 import Search from '@icons/magnifying-glass.svg';
@@ -45,6 +45,8 @@ export default function UserMenu({ content }) {
     },
   ];
 
+  const shouldShowSidebar = () => !(localStorage.getItem('cvSidenavShow') === 'true') ?? true;
+
   const NotificationCard = ({ n }) => (
     <div class="d-flex align-items-center">
       <div>
@@ -62,9 +64,14 @@ export default function UserMenu({ content }) {
   return (
     <Nav className="ml-lg-auto align-items-center d-none d-lg-flex">
       <Nav.Item>
-        <Nav.Link className="nav-link-icon sidenav-toggler" data-action="sidenav-pin" data-target="#sidenav-main">
+        <Button variant="" as={Nav.Link} className="nav-link-icon sidenav-toggler" onClick={() => {
+          let show = shouldShowSidebar();
+          console.log(show);
+          localStorage.setItem('cvSidenavShow', show);
+          show ? document.querySelector('#sidenav-main').classList.add('show') : document.querySelector('#sidenav-main').classList.remove('show');
+        }}>
           <Bars />
-        </Nav.Link>
+        </Button>
       </Nav.Item>
 
       <Nav.Item>
