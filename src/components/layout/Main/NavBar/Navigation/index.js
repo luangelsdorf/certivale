@@ -41,47 +41,47 @@ export default function Navigation({ children }) {
       </NavBarItem>
 
       <NavBarItem toggleAs={Nav.Link} title="Comercial">
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Painel de Controle</NavBarItem>
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Cliente</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/comercial/dashboard">Painel de Controle</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/comercial/cliente">Cliente</NavBarItem>
         <NavBarItem submenu toggleAs={Dropdown.Item} title="Relatórios" className="dropdown-submenu">
-          <NavBarItem className="dropdown-item" href="/agenda/dashboard">Renovação</NavBarItem>
-          <NavBarItem className="dropdown-item" href="/agenda/dashboard">Bonificação</NavBarItem>
-          <NavBarItem className="dropdown-item" href="/agenda/dashboard">Parceiros</NavBarItem>
-          <NavBarItem className="dropdown-item" href="/agenda/dashboard">Suporte</NavBarItem>
+          <NavBarItem className="dropdown-item" href="/comercial/relatorios/renovacao">Renovação</NavBarItem>
+          <NavBarItem className="dropdown-item" href="/comercial/relatorios/bonificacao">Bonificação</NavBarItem>
+          <NavBarItem className="dropdown-item" href="/comercial/relatorios/parceiros">Parceiros</NavBarItem>
+          <NavBarItem className="dropdown-item" href="/comercial/relatorios/suporte">Suporte</NavBarItem>
         </NavBarItem>
         <NavBarItem submenu toggleAs={Dropdown.Item} title="Relacionamento" className="dropdown-submenu">
-          <NavBarItem className="dropdown-item" href="/agenda/dashboard">Aniversários</NavBarItem>
-          <NavBarItem className="dropdown-item" href="/agenda/dashboard">Datas Comemorativas</NavBarItem>
-          <NavBarItem className="dropdown-item" href="/agenda/dashboard">E-mails Promocionais</NavBarItem>
+          <NavBarItem className="dropdown-item" href="/comercial/relacionamento/aniversarios">Aniversários</NavBarItem>
+          <NavBarItem className="dropdown-item" href="/comercial/relacionamento/datas-comemorativas">Datas Comemorativas</NavBarItem>
+          <NavBarItem className="dropdown-item" href="/comercial/relacionamento/emails-promocionais">E-mails Promocionais</NavBarItem>
         </NavBarItem>
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Renovação</NavBarItem>
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Captação de Parceiros</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/comercial/renovacao">Renovação</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/comercial/captacao-de-parceiros">Captação de Parceiros</NavBarItem>
       </NavBarItem>
 
       <NavBarItem toggleAs={Nav.Link} title="Financeiro">
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Painel de Controle</NavBarItem>
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Notas Fiscais</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/financeiro/dashboard">Painel de Controle</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/financeiro/notas-fiscais">Notas Fiscais</NavBarItem>
         <NavBarItem submenu toggleAs={Dropdown.Item} title="Relatórios" className="dropdown-submenu">
-          <NavBarItem className="dropdown-item" href="/agenda/dashboard">Bonificações</NavBarItem>
-          <NavBarItem className="dropdown-item" href="/agenda/dashboard">Vendas</NavBarItem>
-          <NavBarItem className="dropdown-item" href="/agenda/dashboard">Atendimentos</NavBarItem>
-          <NavBarItem className="dropdown-item" href="/agenda/dashboard">Fluxo de Caixa</NavBarItem>
+          <NavBarItem className="dropdown-item" href="/financeiro/relatorios/bonificacoes">Bonificações</NavBarItem>
+          <NavBarItem className="dropdown-item" href="/financeiro/relatorios/vendas">Vendas</NavBarItem>
+          <NavBarItem className="dropdown-item" href="/financeiro/relatorios/atendimentos">Atendimentos</NavBarItem>
+          <NavBarItem className="dropdown-item" href="/financeiro/relatorios/fluxo-de-caixa">Fluxo de Caixa</NavBarItem>
         </NavBarItem>
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Gestão de Contas</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/financeiro/gestao-de-contas">Gestão de Contas</NavBarItem>
       </NavBarItem>
 
       <NavBarItem toggleAs={Nav.Link} title="Parceiros">
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Painel de Controle</NavBarItem>
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Lista Completa</NavBarItem>
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Atividade dos Parceiros</NavBarItem>
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Cadastrados do Site</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/parceiros/dashboard">Painel de Controle</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/parceiros/lista">Lista Completa</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/parceiros/atividade">Atividade dos Parceiros</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/parceiros/cadastro-site">Cadastrados do Site</NavBarItem>
       </NavBarItem>
 
       <NavBarItem toggleAs={Nav.Link} title="Administrativo">
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Filiais</NavBarItem>
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Usuários</NavBarItem>
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Produtos</NavBarItem>
-        <NavBarItem className="dropdown-item" href="/agenda/dashboard">Configurações</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/administrativo/filiais">Filiais</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/administrativo/usuarios">Usuários</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/administrativo/produtos">Produtos</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/administrativo/configurações">Configurações</NavBarItem>
       </NavBarItem>
     </Nav>
   )
