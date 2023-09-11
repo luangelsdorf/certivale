@@ -1,0 +1,12 @@
+.modal.fade {
+  .modal-dialog {
+    transition-duration: 0.25s;
+    transform: scale(0.95);
+  }
+
+  &.show {
+    .modal-dialog {
+      transform: none;
+    }
+  }
+}
