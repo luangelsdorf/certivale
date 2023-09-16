@@ -20,7 +20,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } })
 
       <SessionProvider refetchOnWindowFocus={false} session={session}>
         {
-          router.pathname === '/_error' || router.pathname === '/404' ? (
+          Component.showLayout === false || router.pathname === '/_error' || router.pathname === '/404' ? (
             <Component {...pageProps} />
           ) : (
             <MainLayout pageTitle={Component.Title}>

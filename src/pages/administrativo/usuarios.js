@@ -1,6 +1,5 @@
 import Plus from '@icons/plus.svg';
 import Pencil from '@icons/pencil.svg';
-/* import Trash from '@icons/trash.svg'; */
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Button, Col, Form, Modal } from 'react-bootstrap';
@@ -185,7 +184,7 @@ export default function UsersPage() {
             <thead>
               <tr>
                 <th scope="col">Nome</th>
-                <th scope="col">Criado em</th>
+                <th scope="col">Data de Registro</th>
                 <th scope="col">E-mail</th>
                 <th scope="col">CPF</th>
                 <th scope="col">Bloqueado</th>

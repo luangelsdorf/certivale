@@ -47,11 +47,18 @@
   align-items: center;
 }
 
-.btn, .nav-link, .action-item {
+.btn,
+.nav-link,
+.action-item {
   svg {
     width: 1em;
     height: 1em;
   }
+}
+
+// => Forms
+select.form-control:has(:first-child:checked) {
+  color: $input-placeholder-color;
 }
 
 // => Navbar

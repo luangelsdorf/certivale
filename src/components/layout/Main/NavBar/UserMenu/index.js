@@ -66,7 +66,6 @@ export default function UserMenu({ content }) {
       <Nav.Item>
         <Button variant="" as={Nav.Link} className="nav-link-icon sidenav-toggler" onClick={() => {
           let show = shouldShowSidebar();
-          console.log(show);
           localStorage.setItem('cvSidenavShow', show);
           show ? document.querySelector('#sidenav-main').classList.add('show') : document.querySelector('#sidenav-main').classList.remove('show');
         }}>
