@@ -8,7 +8,7 @@ import cep from '@/utils/cep';
 
 export default function Addresses({ content }) {
   const { register, getValues, setValue, watch, } = useFormContext();
-  const { fields, remove, append, } = useFieldArray({ name: 'addresses', rules: { minLength: 1 }, });
+  const { fields, remove, append, } = useFieldArray({ name: 'addresses' });
   const { data: session } = useSession();
 
   /* const watchAll = watch();
@@ -26,6 +26,7 @@ export default function Addresses({ content }) {
 
   return (
     <div className={styles.addresses}>
+      <h5>Endereço(s)</h5>
       {
         fields.map((field, index) => (
           <div className="card p-4 position-relative" key={field.id}>
@@ -55,7 +56,7 @@ export default function Addresses({ content }) {
           </div>
         ))
       }
-      <Button onClick={append} variant="success" size="sm">
+      <Button onClick={() => append()} variant="success" size="sm">
         <Plus />
         <span>Adicionar Endereço</span>
       </Button>
