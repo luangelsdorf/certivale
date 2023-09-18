@@ -5,6 +5,7 @@ import Search from '@icons/magnifying-glass.svg';
 import Bell from '@icons/bell.svg';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSession } from 'next-auth/react';
 
 export default function UserMenu({ content }) {
   const notifications = [
@@ -44,6 +45,8 @@ export default function UserMenu({ content }) {
       color: 'danger',
     },
   ];
+
+  const { data: session } = useSession();
 
   const shouldShowSidebar = () => !(localStorage.getItem('cvSidenavShow') === 'true') ?? true;
 
@@ -106,10 +109,10 @@ export default function UserMenu({ content }) {
         <Dropdown.Toggle as={Nav.Link} bsPrefix="a">
           <div className="media media-pill align-items-center">
             <span className="avatar rounded-circle">
-              <Image fill alt="Foto de perfil" src="/images/profile-solange.png" />
+              <Image fill alt="Foto de perfil" src="/images/user.jpg" />
             </span>
             <div className="ml-2 d-none d-lg-block">
-              <span className="mb-0 text-sm">Solange S.</span>
+              <span className="mb-0 text-sm">{(session?.user?.name ?? session?.user?.nome).split(' ')[0]}</span>
             </div>
           </div>
         </Dropdown.Toggle>
