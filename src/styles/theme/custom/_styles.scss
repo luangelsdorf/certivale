@@ -21,6 +21,12 @@
 .application {
   opacity: 1;
 
+  .sidenav {
+    .nav-application {
+      margin-top: 90px;
+    }
+  }
+
   .sidenav-header {
     padding: 2rem 0;
     & > a {
