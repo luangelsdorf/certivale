@@ -8,7 +8,6 @@ import { useSession } from 'next-auth/react';
 
 export default function Profile({ content }) {
   const { data: session } = useSession();
-  console.log(session);
   return (
     <div className="sidenav-user d-flex flex-column align-items-center justify-content-between text-center">
       {/* Avatar */}
@@ -17,7 +16,7 @@ export default function Profile({ content }) {
           <Image fill alt="Foto de perfil" src="/images/user.jpg" />
         </a>
         <div className="mt-4">
-          <h5 className="mb-0 text-white">{(session?.user?.name ?? session?.user?.nome).split(' ')[0]}</h5>
+          <h5 className="mb-0 text-white">{(session?.user?.name ?? session?.user?.nome)?.split(' ')[0]}</h5>
           {/* <span className="d-block text-sm text-white opacity-8">Diretora Operacional</span> */}
         </div>
       </div>

@@ -112,7 +112,7 @@ export default function UserMenu({ content }) {
               <Image fill alt="Foto de perfil" src="/images/user.jpg" />
             </span>
             <div className="ml-2 d-none d-lg-block">
-              <span className="mb-0 text-sm">{(session?.user?.name ?? session?.user?.nome).split(' ')[0]}</span>
+              <span className="mb-0 text-sm">{(session?.user?.name ?? session?.user?.nome)?.split(' ')[0]}</span>
             </div>
           </div>
         </Dropdown.Toggle>
