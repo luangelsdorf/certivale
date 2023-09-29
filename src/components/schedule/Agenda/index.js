@@ -2,7 +2,6 @@ import styles from './Agenda.module.scss';
 import { Button, ButtonGroup, Card, Col, Form, Modal, Row } from "react-bootstrap";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import listPlugin from '@fullcalendar/list';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import ptbrLocale from '@fullcalendar/core/locales/pt-br';
@@ -15,7 +14,6 @@ import { useForm } from 'react-hook-form';
 
 export default function Agenda() {
   const fcRef = useRef(null);
-  const [view, setView] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [action, setAction] = useState({ text: 'Ver', method: 'get' });
   const { data: session, status } = useSession();
@@ -25,13 +23,17 @@ export default function Agenda() {
   const [people, setPeople] = useState([]);
   const [users, setUsers] = useState([]);
 
+  const [loading, setLoading] = useState(false);
+
   const closeModal = () => setIsModalOpen(false);
   const showModal = () => setIsModalOpen(true);
+
+  const controller = new AbortController();
 
   const { register, setValue, getValues, handleSubmit, reset, watch } = useForm({
     person_id: null,
     user_id: null,
-    subsidiary_id: null,
+    subsidiary_id: '0',
     schedule_status: 'A',
     schedule_type: 'A',
     observation: null,
@@ -39,17 +41,18 @@ export default function Agenda() {
     date_time: null,
   });
 
-  const watchAllFields = watch();
-  console.log(watchAllFields);
+  const watchFields = watch();
 
   function handleNavigation({ currentTarget: { dataset } }) {
     let fc = fcRef.current;
     if (dataset.calendarAction) {
       fc.getApi()[dataset.calendarAction]();
-      setView({ ...view, type: fc.calendar.view.type, title: fc.calendar.view.title, });
     }
     else if (dataset.calendarView) {
       fc.calendar.changeView(dataset.calendarView);
+      document.querySelectorAll('[data-calendar-view]')?.forEach(el => {
+        el.dataset.calendarView === fc.calendar.view.type ? el.classList.add('active') : el.classList.remove('active')
+      })
     }
   }
 
@@ -69,127 +72,141 @@ export default function Agenda() {
     console.log(info);
   }
 
+  function handleDatesSet({ view }) {
+    let calendarTitle = document.querySelector('#calendar-title');
+    if (calendarTitle) calendarTitle.textContent = view.title;
+  }
+
+  /*** Initial Data ***/
   useEffect(() => {
     if (status === 'authenticated') {
       api.defaults.headers.common.Authorization = `Bearer ${session?.token}`;
-      api.get('/schedules/list').then(response => setSchedules(response.data.items));
+      /* api.get('/schedules/list').then(response => setSchedules(response.data.items)); */
       api.get('/subsidiaries/list').then(response => setSubsidiaries(response.data.items));
-      api.get('/people/list').then(response => setPeople(response.data.items));
+      /* api.get('/people/list').then(response => setPeople(response.data.items)); */
       api.get('/users/list').then(response => setUsers(response.data.items));
     }
 
     return () => delete api.defaults.headers.common.Authorization;
   }, [status]);
 
+  /*** Axios Interceptors ***/
   useEffect(() => {
     const interceptError = error => console.error(error);
+
+    const interceptReq = (request) => {
+      if (request.method === 'get' && request.url.includes('schedules')) {
+        console.log('%cloading schedules...', 'color: skyblue');
+        document.querySelector(`.${styles.card}`)?.classList.add(styles.loading);
+      }
+      return request;
+    }
+
     const interceptRes = (response) => {
       if (response.config.method !== 'get') {
         closeModal();
-        api.get('/schedules/list')
-          .then(response => setSchedules(response.data.items))
-          .catch(err => console.error(err));
+      } else if (response.config.url.includes('schedules')) {
+        console.log('%cloaded schedules!', 'color: limegreen');
+        document.querySelector(`.${styles.card}`)?.classList.remove(styles.loading);
       }
       return response;
     }
 
-    let apiInt = api.interceptors.response.use(interceptRes, interceptError);
+    let requestInt = api.interceptors.request.use(interceptReq, interceptError);
+    let responseInt = api.interceptors.response.use(interceptRes, interceptError);
 
-    return () => api.interceptors.response.eject(apiInt)
-  }, [action]);
+    return () => {
+      api.interceptors.request.eject(requestInt);
+      api.interceptors.response.eject(responseInt);
+    }
+  }, []);
 
-  const AgendaTitle = ({ view }) => (
-    <Row className="justify-content-between align-items-center mb-4">
-      <Col className="d-flex align-items-center">
-        <h2 id="calendar-title" className="h4 d-inline-block mb-0 text-white">{view?.title}</h2>
-      </Col>
-      <Col lg="auto" className="mt-3 mt-lg-0 text-lg-right">
-        <ButtonGroup className="mr-lg-1">
-          <Button data-calendar-action="prev" onClick={handleNavigation} size="sm" variant="neutral">
-            <AngleLeft height="1em" />
-          </Button>
-          <Button data-calendar-action="next" onClick={handleNavigation} size="sm" variant="neutral">
-            <AngleRight height="1em" />
-          </Button>
-        </ButtonGroup>
-        <ButtonGroup>
-          <Button className={view?.type === 'dayGridMonth' ? 'active' : undefined} data-calendar-view="dayGridMonth" onClick={handleNavigation} size="sm" variant="neutral">Mês</Button>
-          <Button className={view?.type === 'timeGridWeek' ? 'active' : undefined} data-calendar-view="timeGridWeek" onClick={handleNavigation} size="sm" variant="neutral">Semana</Button>
-          <Button className={view?.type === 'listWeek' ? 'active' : undefined} data-calendar-view="listWeek" onClick={handleNavigation} size="sm" variant="neutral">Fechar</Button>
-          <Form.Control defaultValue="0" as="select" className="ml-1" onChange={(e) => setValue('subsidiary_id', e.target.value)}>
-            <option disabled value="0">Filial</option>
-            {subsidiaries.map(sub => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
-          </Form.Control>
-        </ButtonGroup>
-      </Col>
-    </Row>
-  );
+  /*** Update events based on subsidiary ***/
+  useEffect(() => {
+    /* console.log('changed subsidiary:', getValues('subsidiary_id')); */
+  }, [watchFields.subsidiary_id]);
+
+  const AgendaTitle = () => {
+    return (
+      <Row className="justify-content-between align-items-center mb-4">
+        <Col className="d-flex align-items-center">
+          <h2 id="calendar-title" className="h4 d-inline-block mb-0 text-white" />
+        </Col>
+        <Col lg="auto" className="mt-3 mt-lg-0 text-lg-right d-flex">
+          <ButtonGroup className="mr-lg-1">
+            <Button disabled={getValues('subsidiary_id') === '0'} data-calendar-action="prev" onClick={handleNavigation} size="sm" variant="neutral">
+              <AngleLeft />
+            </Button>
+            <Button disabled={getValues('subsidiary_id') === '0'} data-calendar-action="next" onClick={handleNavigation} size="sm" variant="neutral">
+              <AngleRight />
+            </Button>
+          </ButtonGroup>
+          <ButtonGroup toggle>
+            <Button disabled={getValues('subsidiary_id') === '0'} data-calendar-view="dayGridMonth" onClick={handleNavigation} size="sm" variant="neutral">Mês</Button>
+            <Button disabled={getValues('subsidiary_id') === '0'} data-calendar-view="timeGridWeek" onClick={handleNavigation} size="sm" variant="neutral">Semana</Button>
+            <Button disabled={getValues('subsidiary_id') === '0'} data-calendar-view="timeGridDay" onClick={handleNavigation} size="sm" variant="neutral">Dia</Button>
+            <Form.Control defaultValue="0" as="select" className="ml-1" size="sm" {...register('subsidiary_id', { required: true })}>
+              <option disabled value="0">Filial</option>
+              {subsidiaries.map(sub => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
+            </Form.Control>
+          </ButtonGroup>
+        </Col>
+      </Row>
+    );
+  };
 
   return (
     <div id="agenda">
-      <AgendaTitle view={view} />
+      <AgendaTitle />
       <Row>
         <Col>
-          <Card>
-            <FullCalendar
-              viewDidMount={({ view: { title }, view: { type } }) => setView({ type, title })}
-              ref={fcRef}
-              plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
-              dateClick={handleDateClick}
-              eventClick={handleEventClick}
-              weekends={false}
-              eventOverlap={false}
-              slotEventOverlap={false}
-              allDaySlot={false}
-              stickyHeaderDates={false}
-              displayEventTime={false}
-              headerToolbar={false}
-              locale={ptbrLocale}
-              slotLabelInterval="01:00:00"
-              slotDuration="00:20:00"
-              slotMinTime="08:00:00"
-              slotMaxTime="18:00:00"
-              initialView="timeGridWeek"
-              businessHours={[
-                {
-                  daysOfWeek: [1, 2, 3, 4, 5],
-                  startTime: '08:00',
-                  endTime: '12:00',
-                },
-                {
-                  daysOfWeek: [1, 2, 3, 4, 5],
-                  startTime: '13:00',
-                  endTime: '18:00',
-                }
-              ]}
-              events={[
-                {
-                  title: 'Evento 1',
-                  start: '2023-08-08T09:00:00',
-                  end: '2023-08-08T09:20:00',
-                  editable: true,
-                },
-                {
-                  title: 'Evento 2',
-                  start: '2023-08-08T09:20:00',
-                  end: '2023-08-08T09:40:00',
-                  editable: true,
-                },
-                {
-                  title: 'Evento 3',
-                  start: '2023-08-08T09:40:00',
-                  end: '2023-08-08T10:00:00',
-                  editable: true,
-                },
-                {
-                  title: 'Evento 4',
-                  start: '2023-08-09T09:00:00',
-                  end: '2023-08-09T09:20:00',
-                  editable: true,
-                },
-              ]}
-            />
-          </Card>
+          {getValues('subsidiary_id')?.length > 1 ? (
+            <Card className={styles.card}>
+              <FullCalendar
+                ref={fcRef}
+                events={(info, successCallback, failureCallback) => {
+                  api.get(`/schedules/${getValues('subsidiary_id')}/${info.startStr}/${info.endStr}`, { signal: controller.signal })
+                    .then(response => {
+                      successCallback(
+                        response.data.map(schedule => ({
+                          title: schedule.title,
+                          start: new Date(schedule.date_time).toISOString(),
+                          end: new Date(new Date(schedule.date_time).getTime() + 1.2e+6).toISOString(),
+                        }))
+                      )
+                    })
+                    .catch(error => failureCallback(error));
+                }}
+                businessHours={[
+                  {
+                    daysOfWeek: [1, 2, 3, 4, 5],
+                    startTime: '07:00',
+                    endTime: '19:00',
+                  }
+                ]}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                dateClick={handleDateClick}
+                eventClick={handleEventClick}
+                datesSet={handleDatesSet}
+                weekends={false}
+                eventOverlap={false}
+                slotEventOverlap={false}
+                allDaySlot={false}
+                stickyHeaderDates={false}
+                displayEventTime={false}
+                headerToolbar={false}
+                nowIndicator={false}
+                locale={ptbrLocale}
+                slotLabelInterval="01:00:00"
+                slotDuration="00:20:00"
+                slotMinTime="08:00:00"
+                slotMaxTime="18:00:00"
+                initialView="timeGridWeek"
+              />
+            </Card>
+          ) : (
+            <h4 className="mt-3 text-danger text-center">Por favor selecione uma filial.</h4>
+          )}
         </Col>
       </Row>
 
@@ -210,10 +227,10 @@ export default function Agenda() {
               {users.map(user => <option key={user.id} value={user.id}>{user.name}</option>)}
             </Form.Control>
 
-            <Form.Control defaultValue="0" className="mb-3" as="select" {...register('subsidiary_id', { required: true })}>
+            {/* <Form.Control className="mb-3" as="select">
               <option disabled value="0">Filial</option>
               {subsidiaries.map(sub => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
-            </Form.Control>
+            </Form.Control> */}
 
             <Form.Control defaultValue="0" className="mb-3" as="select" {...register('schedule_type', { required: true })}>
               <option disabled value="0">Tipo de Agendamento</option>

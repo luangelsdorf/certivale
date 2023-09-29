@@ -1,0 +1,15 @@
+.card {
+  position: relative;
+}
+
+.card.loading {
+  justify-content: center;
+  align-items: center;
+
+  &::before {
+    content: "Carregando...";
+    position: absolute;
+    font-size: larger;
+    z-index: 10;
+  }
+}

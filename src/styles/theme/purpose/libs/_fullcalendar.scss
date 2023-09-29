@@ -5,6 +5,7 @@
 
 :root {
   --fc-border-color: #{lighten($table-border-color, 2%)};
+  --fc-today-bg-color: transparent;
 }
 
 #calendar-title {
@@ -202,6 +203,10 @@
     .fc-scroller {
       overflow: hidden !important;
     }
+  }
+
+  .fc-timegrid-slot {
+    height: 40px;
   }
 
   .fc-timegrid-slot-minor {
