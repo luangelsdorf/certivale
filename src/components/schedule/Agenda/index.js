@@ -96,7 +96,7 @@ export default function Agenda() {
 
     const interceptReq = (request) => {
       if (request.method === 'get' && request.url.includes('schedules')) {
-        console.log('%cloading schedules...', 'color: skyblue');
+        console.info('%cloading schedules...', 'color: skyblue');
         document.querySelector(`.${styles.card}`)?.classList.add(styles.loading);
       }
       return request;
@@ -106,7 +106,7 @@ export default function Agenda() {
       if (response.config.method !== 'get') {
         closeModal();
       } else if (response.config.url.includes('schedules')) {
-        console.log('%cloaded schedules!', 'color: limegreen');
+        console.info('%cloaded schedules!', 'color: limegreen');
         document.querySelector(`.${styles.card}`)?.classList.remove(styles.loading);
       }
       return response;
@@ -167,13 +167,12 @@ export default function Agenda() {
                 events={(info, successCallback, failureCallback) => {
                   api.get(`/schedules/${getValues('subsidiary_id')}/${info.startStr}/${info.endStr}`, { signal: controller.signal })
                     .then(response => {
-                      successCallback(
-                        response.data.map(schedule => ({
-                          title: schedule.title,
-                          start: new Date(schedule.date_time).toISOString(),
-                          end: new Date(new Date(schedule.date_time).getTime() + 1.2e+6).toISOString(),
-                        }))
-                      )
+                      let events = response.data.map(schedule => ({
+                        title: schedule.title,
+                        start: new Date(schedule.date_time).toISOString(),
+                        end: new Date(new Date(schedule.date_time).getTime() + 1.2e+6).toISOString(),
+                      }));
+                      successCallback(events);
                     })
                     .catch(error => failureCallback(error));
                 }}
@@ -197,6 +196,7 @@ export default function Agenda() {
                 headerToolbar={false}
                 nowIndicator={false}
                 locale={ptbrLocale}
+                height="auto"
                 slotLabelInterval="01:00:00"
                 slotDuration="00:20:00"
                 slotMinTime="08:00:00"
