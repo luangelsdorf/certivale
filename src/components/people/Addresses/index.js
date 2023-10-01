@@ -8,18 +8,18 @@ import cep from '@/utils/cep';
 
 export default function Addresses({ content }) {
   const { register, getValues, setValue, watch, } = useFormContext();
-  const { fields, remove, append, } = useFieldArray({ name: 'addresses' });
+  const { fields, remove, append, } = useFieldArray({ name: 'person.addresses' });
   const { data: session } = useSession();
 
   /* const watchAll = watch();
   console.log(watchAll); */
 
   function getCep(index) {
-    cep(getValues(`addresses.${index}.zip`), session.token)
+    cep(getValues(`person.addresses.${index}.zip`), session.token)
       .then(response => response.ok && response.json())
       .then(response => {
-        setValue(`addresses.${index}.street`, response.street);
-        setValue(`addresses.${index}.county_ibge_code`, response.county.ibge_code);
+        setValue(`person.addresses.${index}.street`, response.street);
+        setValue(`person.addresses.${index}.county_ibge_code`, response.county.ibge_code);
       })
       .catch(error => console.error(error));
   }
@@ -30,12 +30,12 @@ export default function Addresses({ content }) {
       {
         fields.map((field, index) => (
           <div className="card p-4 position-relative" key={field.id}>
-            <Button variant="danger" size="sm" className="position-absolute btn-icon-only top-0 right-0 m-0" onClick={() => remove(index)}>
+            <Button variant="danger" size="xs" className="position-absolute btn-icon-only top-0 right-0 m-0" onClick={() => remove(index)}>
               <Trash />
             </Button>
             <Form.Row>
               <Col sm="auto">
-                <Form.Control minLength="8" maxLength="9" placeholder="CEP" className="mb-2" {...register(`addresses.${index}.zip`, { required: true })} />
+                <Form.Control minLength="8" maxLength="9" placeholder="CEP" className="mb-2" {...register(`person.addresses.${index}.zip`, { required: true })} />
               </Col>
               <Col sm="auto">
                 <Button onClick={() => getCep(index)}>Buscar CEP</Button>
@@ -43,14 +43,15 @@ export default function Addresses({ content }) {
             </Form.Row>
             <Form.Row>
               <Col>
-                <Form.Control placeholder="Rua" className="mb-2" {...register(`addresses.${index}.street`, { required: true })} />
+                <Form.Control placeholder="Rua" className="mb-2" {...register(`person.addresses.${index}.street`, { required: true })} />
               </Col>
               <Col>
-                <Form.Control placeholder="Número" className="mb-2" {...register(`addresses.${index}.number`, { required: true })} />
+                <Form.Control placeholder="Número" className="mb-2" {...register(`person.addresses.${index}.number`, { required: true })} />
               </Col>
             </Form.Row>
-            <Form.Control placeholder="Complemento" className="mb-2" {...register(`addresses.${index}.complement`)} />
-            <Form.Control type="hidden" {...register(`addresses.${index}.county_ibge_code`, { required: true })} />
+            <Form.Control placeholder="Bairro" className="mb-2" {...register(`person.addresses.${index}.neighborhood`, { required: true })} />
+            <Form.Control placeholder="Complemento" className="mb-2" {...register(`person.addresses.${index}.complement`)} />
+            <Form.Control type="hidden" {...register(`person.addresses.${index}.county_ibge_code`, { required: true })} />
           </div>
         ))
       }

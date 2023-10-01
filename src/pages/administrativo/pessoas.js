@@ -7,8 +7,7 @@ import { Button, Form, Modal } from 'react-bootstrap';
 import { FormProvider, useForm } from 'react-hook-form';
 import api from 'services/axios';
 import Head from 'next/head';
-import Addresses from '@/components/people/Addresses';
-import Contacts from '@/components/people/Contacts';
+import PersonFields from '@/components/people/PersonFields';
 
 export default function PeoplePage() {
   const { data: session, status } = useSession();
@@ -59,20 +58,21 @@ export default function PeoplePage() {
 
   const methods = useForm({
     defaultValues: {
-      id: null,
-      name: null,
-      person_type: 'F',
-      document: null,
-      fantasy_name: null,
-      state_registration: null,
-      county_registration: null,
-      representative_id: null,
-      contacts: [],
-      addresses: [],
+      person: {
+        id: null,
+        name: null,
+        person_type: 'F',
+        document: null,
+        fantasy_name: null,
+        state_registration: null,
+        county_registration: null,
+        representative_id: null,
+        birth_date: null,
+        contacts: [],
+        addresses: [],
+      }
     }
   });
-
-  const watchPersonType = methods.watch('person_type');
 
   /* const watchAllFields = methods.watch();
   console.log(watchAllFields); */
@@ -240,56 +240,8 @@ export default function PeoplePage() {
 
           <Modal.Body>
             <FormProvider {...methods}>
-              <Form id="modalForm" onSubmit={methods.handleSubmit(onSubmit, onError)}>
-                {(action.text === 'Editar' || action.text === 'Criar') && (
-                  <>
-                    <Form.Control defaultValue="F" className="mb-3" as="select" {...methods.register('person_type', { required: true, })}>
-                      <option value="F">Pessoa Física</option>
-                      <option value="J">Pessoa Jurídica</option>
-                    </Form.Control>
-                    <Form.Control
-                      className="mb-3"
-                      placeholder="Nome"
-                      {...methods.register('name', { required: true, })}
-                    />
-                    <Form.Control
-                      className="mb-3"
-                      placeholder="Documento (CPF/CNPJ)"
-                      {...methods.register('document', { required: true, })}
-                    />
-                  </>
-                )}
-                {(watchPersonType === 'J' && (action.text === 'Criar' || action.text === 'Editar')) && (
-                  <>
-                    <Form.Control
-                      className="mb-3"
-                      placeholder="Nome Fantasia"
-                      {...methods.register('fantasy_name')}
-                    />
-                    <Form.Control
-                      className="mb-3"
-                      placeholder="Inscrição Estadual"
-                      {...methods.register('state_registration')}
-                    />
-                    <Form.Control
-                      className="mb-3"
-                      placeholder="Inscrição Municipal"
-                      {...methods.register('county_registration')}
-                    />
-                  </>
-                )}
-                {action.text === 'Criar' && (
-                  <>
-                    <hr />
-                    <Addresses />
-                    <hr />
-                    <Contacts />
-                  </>
-                )}
-                <Form.Control
-                  type="hidden"
-                  {...methods.register('id')}
-                />
+              <Form id="modalForm">
+                <PersonFields action={action} />
               </Form>
             </FormProvider>
             {action.method === 'delete' && (
