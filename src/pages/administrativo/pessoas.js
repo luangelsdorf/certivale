@@ -45,7 +45,7 @@ export default function PeoplePage() {
           .then(response => setPeople(response.data.items))
           .catch(err => console.error(err));
       } else {
-        closeModal();
+        /* closeModal(); */
       }
 
       return response;
@@ -61,7 +61,7 @@ export default function PeoplePage() {
       person: {
         id: null,
         name: null,
-        person_type: 'F',
+        person_type: '0',
         document: null,
         fantasy_name: null,
         state_registration: null,
@@ -144,7 +144,7 @@ export default function PeoplePage() {
         <div className="actions ml-3">
           <Button
             onClick={() => {
-              Object.keys(methods.getValues()).forEach(key => methods.setValue(key, props[key]));
+              methods.reset({ person: props }, { keepDefaultValues: true });
               setAction({ text: 'Editar', method: 'put' });
               showModal();
             }}
@@ -156,7 +156,7 @@ export default function PeoplePage() {
           </Button>
           <Button
             onClick={() => {
-              Object.keys(methods.getValues()).forEach(key => methods.setValue(key, props[key]));
+              methods.reset({ person: props }, { keepDefaultValues: true });
               setAction({ text: 'Excluir', method: 'delete' });
               showModal();
             }}
@@ -245,7 +245,7 @@ export default function PeoplePage() {
               </Form>
             </FormProvider>
             {action.method === 'delete' && (
-              <h4>Tem certeza que deseja excluir {methods.getValues('name')}?</h4>
+              <h4>Tem certeza que deseja excluir {methods.getValues('person.name')}?</h4>
             )}
             {action.method === 'patch' && (
               <h4>Tem certeza que deseja {methods.getValues('is_blocked') ? 'desbloquear' : 'bloquear'} {methods.getValues('name')}?</h4>

@@ -29,7 +29,7 @@ export default function Addresses({ content }) {
       <h5>Endereço(s)</h5>
       {
         fields.map((field, index) => (
-          <div className="card p-4 position-relative" key={field.id}>
+          <div className="card p-3 position-relative" key={field.id}>
             <Button variant="danger" size="xs" className="position-absolute btn-icon-only top-0 right-0 m-0" onClick={() => remove(index)}>
               <Trash />
             </Button>

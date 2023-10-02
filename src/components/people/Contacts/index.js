@@ -21,14 +21,14 @@ export default function Contacts({ content }) {
       {
         fields.map((field, index) => (
           <div key={field.id}>
-            <div className="card p-4 position-relative" key={field.id}>
+            <div className="card p-3 position-relative" key={field.id}>
               <Button variant="danger" size="xs" className="position-absolute btn-icon-only top-0 right-0 m-0" onClick={() => remove(index)}>
                 <Trash />
               </Button>
               <Form.Row>
                 <Col sm="5">
                   <Form.Control as="select" defaultValue="0" {...register(`person.contacts.${index}.contact_type_id`)}>
-                    <option disabled value="0">Selecione o tipo</option>
+                    <option disabled value="0">Tipo de Contato</option>
                     <option value="1">Celular</option>
                     <option value="2">Telefone</option>
                     <option value="3">E-mail</option>

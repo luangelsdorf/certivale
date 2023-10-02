@@ -80,7 +80,7 @@ export default function Navigation({ children }) {
       <NavBarItem toggleAs={Nav.Link} title="Administrativo">
         <NavBarItem className="dropdown-item" href="/administrativo/filiais">Filiais</NavBarItem>
         <NavBarItem className="dropdown-item" href="/administrativo/usuarios">Usuários</NavBarItem>
-        <NavBarItem className="dropdown-item" href="/administrativo/pessoas">Pessoas</NavBarItem>
+        {/* <NavBarItem className="dropdown-item" href="/administrativo/pessoas">Pessoas</NavBarItem> */}
         <NavBarItem className="dropdown-item" href="/administrativo/produtos">Produtos</NavBarItem>
         <NavBarItem className="dropdown-item" href="/administrativo/configurações">Configurações</NavBarItem>
       </NavBarItem>
