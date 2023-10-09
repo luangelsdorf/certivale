@@ -9,7 +9,7 @@ import api from 'services/axios';
 import Head from 'next/head';
 import PersonFields from '@/components/people/PersonFields';
 
-export default function PeoplePage() {
+export default function ClientsPage() {
   const { data: session, status } = useSession();
 
   const [people, setPeople] = useState([]);
@@ -174,7 +174,7 @@ export default function PeoplePage() {
   return (
     <>
       <Head>
-        <title>Pessoas | Administrativo</title>
+        <title>Clientes | Comercial</title>
       </Head>
 
       {/* Page title */}
