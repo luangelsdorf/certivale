@@ -10,7 +10,7 @@ const authHandler = NextAuth({
       type: 'credentials',
 
       credentials: {
-        user: { label: "Nome de usuário", type: "text", placeholder: "luanferreira" },
+        user: { label: "Nome de usuário", type: "text" },
         password: { label: "Senha", type: "password" }
       },
 

@@ -1,27 +1,28 @@
 import styles from './Agenda.module.scss';
-import { Button, ButtonGroup, Card, Col, Form, Modal, Row } from "react-bootstrap";
+import { Button, ButtonGroup, Card, Col, Form, Modal, Row, Tab, Tabs } from "react-bootstrap";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import ptbrLocale from '@fullcalendar/core/locales/pt-br';
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import AngleRight from '@icons/angle-right.svg';
 import AngleLeft from '@icons/angle-left.svg';
 import { useSession } from 'next-auth/react';
 import api from 'services/axios';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
+import PersonFields from '@/components/people/PersonFields';
 
 export default function Agenda() {
   const fcRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [view, setView] = useState(null);
   const [action, setAction] = useState({ text: 'Ver', method: 'get' });
   const { data: session, status } = useSession();
 
+  const [products, setProducts] = useState([]);
   const [subsidiaries, setSubsidiaries] = useState([]);
-  const [schedules, setSchedules] = useState([]);
-  const [people, setPeople] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [subsidiaryId, setSubsidiaryId] = useState('0');
 
   const [loading, setLoading] = useState(false);
 
@@ -30,18 +31,11 @@ export default function Agenda() {
 
   const controller = new AbortController();
 
-  const { register, setValue, getValues, handleSubmit, reset, watch } = useForm({
-    person_id: null,
-    user_id: null,
-    subsidiary_id: '0',
-    schedule_status: 'A',
-    schedule_type: 'A',
-    observation: null,
-    description: null,
-    date_time: null,
-  });
+  const methods = useForm();
 
-  const watchFields = watch();
+  /* const watchFields = methods.watch();
+  console.log(watchFields); */
+
 
   function handleNavigation({ currentTarget: { dataset } }) {
     let fc = fcRef.current;
@@ -57,34 +51,28 @@ export default function Agenda() {
   }
 
   function handleDateClick(info) {
-    /* info.date.setMinutes(0); */
-    reset();
+    methods.reset(undefined, { keepDefaultValues: true, keepSubmitCount: true });
+    setAction({ text: 'Criar', method: 'post' });
     showModal();
     let year = info.date.getFullYear();
     let month = (info.date.getMonth() + 1).toString().padStart(2, '0');
-    let monthDay = info.date.getDate();
+    let monthDay = info.date.getDate().toString().padStart(2, '0');
     let time = info.date.toLocaleTimeString();
     let dateTime = `${year}-${month}-${monthDay}T${time}`;
     console.log(dateTime);
+    methods.setValue('date_time', dateTime);
   }
 
   function handleEventClick(info) {
     console.log(info);
   }
 
-  function handleDatesSet({ view }) {
-    let calendarTitle = document.querySelector('#calendar-title');
-    if (calendarTitle) calendarTitle.textContent = view.title;
-  }
-
   /*** Initial Data ***/
   useEffect(() => {
     if (status === 'authenticated') {
       api.defaults.headers.common.Authorization = `Bearer ${session?.token}`;
-      /* api.get('/schedules/list').then(response => setSchedules(response.data.items)); */
       api.get('/subsidiaries/list').then(response => setSubsidiaries(response.data.items));
-      /* api.get('/people/list').then(response => setPeople(response.data.items)); */
-      api.get('/users/list').then(response => setUsers(response.data.items));
+      api.get('/products/list').then(response => setProducts(response.data.items));
     }
 
     return () => delete api.defaults.headers.common.Authorization;
@@ -95,9 +83,9 @@ export default function Agenda() {
     const interceptError = error => console.error(error);
 
     const interceptReq = (request) => {
-      if (request.method === 'get' && request.url.includes('schedules')) {
-        console.info('%cloading schedules...', 'color: skyblue');
-        document.querySelector(`.${styles.card}`)?.classList.add(styles.loading);
+      if (request.method === 'get' && request.url.includes('schedules') && request.url.includes(':')) {
+        setLoading(true);
+        /* console.info('%cloading schedules...', 'color: skyblue'); */
       }
       return request;
     }
@@ -105,9 +93,9 @@ export default function Agenda() {
     const interceptRes = (response) => {
       if (response.config.method !== 'get') {
         closeModal();
-      } else if (response.config.url.includes('schedules')) {
-        console.info('%cloaded schedules!', 'color: limegreen');
-        document.querySelector(`.${styles.card}`)?.classList.remove(styles.loading);
+      } else if (response.config.url.includes('schedules') && response.config.url.includes(':')) {
+        setLoading(false);
+        /* console.info('%cloaded schedules!', 'color: limegreen'); */
       }
       return response;
     }
@@ -121,32 +109,88 @@ export default function Agenda() {
     }
   }, []);
 
-  /*** Update events based on subsidiary ***/
-  useEffect(() => {
-    /* console.log('changed subsidiary:', getValues('subsidiary_id')); */
-  }, [watchFields.subsidiary_id]);
+  const getEvents = useCallback((info, successCallback, failureCallback) => {
+    /* if (methods.formState.isValid) { */
+      api.get(`/schedules/${subsidiaryId}/${info.startStr}/${info.endStr}`, { signal: controller.signal })
+        .then(response => {
+          let events = response.data.map(schedule => ({
+            title: schedule.title.replace('Horario', 'Horário'),
+            start: new Date(schedule.date_time).toISOString(),
+            end: new Date(new Date(schedule.date_time).getTime() + 1.2e+6).toISOString(),
+          }));
+          console.log(events);
+          successCallback(events);
+        })
+        .catch(error => failureCallback(error));
+    /* } else {
+      return successCallback(fcRef?.current?.calendar?.getEvents());
+    } */
+    /* console.log('submitCount:', methods.formState.submitCount); */
+  }, [api, subsidiaryId, methods.formState.submitCount]);
 
-  const AgendaTitle = () => {
+  function onSubmit(data) {
+    let isDirty = !!Object.keys(methods.formState.dirtyFields).length;
+    console.log(`%cis dirty:%c ${isDirty}`, 'color: cyan', 'color: orchid');
+
+    let bodyBase = {
+      user_id: session.user.id,
+      subsidiary_id: subsidiaryId,
+      schedule_status: 'A',
+      date_time: data.date_time,
+    }
+
+    if (!isDirty) {
+      api.post(`/schedules/`, { ...bodyBase, schedule_type: 'R' });
+    } else {
+      if (data?.person?.id) {
+        api.post(`/schedules/`, { ...bodyBase, person_id: data.person.id, schedule_type: 'P' });
+      } else {
+        let { contacts, addresses, ...personBody } = data.person;
+        let [year, month, day] = personBody.birth_date.split('-');
+        personBody.birth_date = `${day}-${month}-${year}`;
+        api.post(`/people/`, personBody)
+          .then(res => {
+            if (contacts.length) {
+              contacts.forEach(contact => api.post(`/people/${res.data.id}/contact`, contact));
+            }
+            return res;
+          })
+          .then(res => {
+            if (addresses.length) {
+              addresses.forEach(address => api.post(`/people/${res.data.id}/address`, address));
+            }
+            return res;
+          })
+          .then(res => api.post(`/schedules/`, { ...bodyBase, person_id: res.data.id, schedule_type: 'P' }));
+      }
+    }
+  }
+
+  function onSubmitError(errors) {
+    console.error(errors);
+  }
+
+  const AgendaTitle = ({ view }) => {
     return (
       <Row className="justify-content-between align-items-center mb-4">
         <Col className="d-flex align-items-center">
-          <h2 id="calendar-title" className="h4 d-inline-block mb-0 text-white" />
+          <h2 id="calendar-title" className="h4 d-inline-block mb-0 text-white">{view?.title}</h2>
         </Col>
         <Col lg="auto" className="mt-3 mt-lg-0 text-lg-right d-flex">
           <ButtonGroup className="mr-lg-1">
-            <Button disabled={getValues('subsidiary_id') === '0'} data-calendar-action="prev" onClick={handleNavigation} size="sm" variant="neutral">
+            <Button disabled={subsidiaryId === '0'} data-calendar-action="prev" onClick={handleNavigation} size="sm" variant="neutral">
               <AngleLeft />
             </Button>
-            <Button disabled={getValues('subsidiary_id') === '0'} data-calendar-action="next" onClick={handleNavigation} size="sm" variant="neutral">
+            <Button disabled={subsidiaryId === '0'} data-calendar-action="next" onClick={handleNavigation} size="sm" variant="neutral">
               <AngleRight />
             </Button>
           </ButtonGroup>
           <ButtonGroup toggle>
-            <Button disabled={getValues('subsidiary_id') === '0'} data-calendar-view="dayGridMonth" onClick={handleNavigation} size="sm" variant="neutral">Mês</Button>
-            <Button disabled={getValues('subsidiary_id') === '0'} data-calendar-view="timeGridWeek" onClick={handleNavigation} size="sm" variant="neutral">Semana</Button>
-            <Button disabled={getValues('subsidiary_id') === '0'} data-calendar-view="timeGridDay" onClick={handleNavigation} size="sm" variant="neutral">Dia</Button>
-            <Form.Control defaultValue="0" as="select" className="ml-1" size="sm" {...register('subsidiary_id', { required: true })}>
-              <option disabled value="0">Filial</option>
+            <Button active={view?.type === 'dayGridMonth'} disabled={subsidiaryId === '0'} data-calendar-view="dayGridMonth" onClick={handleNavigation} size="sm" variant="neutral">Mês</Button>
+            <Button active={view?.type === 'timeGridWeek'} disabled={subsidiaryId === '0'} data-calendar-view="timeGridWeek" onClick={handleNavigation} size="sm" variant="neutral">Semana</Button>
+            <Button active={view?.type === 'timeGridDay'} disabled={subsidiaryId === '0'} data-calendar-view="timeGridDay" onClick={handleNavigation} size="sm" variant="neutral">Dia</Button>
+            <Form.Control value={subsidiaryId} as="select" className="ml-1" size="sm" onChange={e => setSubsidiaryId(e.target.value)}>
+              <option disabled value="0">Selecione uma filial</option>
               {subsidiaries.map(sub => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
             </Form.Control>
           </ButtonGroup>
@@ -157,25 +201,14 @@ export default function Agenda() {
 
   return (
     <div id="agenda">
-      <AgendaTitle />
+      <AgendaTitle view={view} />
       <Row>
         <Col>
-          {getValues('subsidiary_id')?.length > 1 ? (
-            <Card className={styles.card}>
+          {subsidiaryId?.length > 1 ? (
+            <Card className={loading ? `${styles.card} ${styles.loading}` : styles.card}>
               <FullCalendar
                 ref={fcRef}
-                events={(info, successCallback, failureCallback) => {
-                  api.get(`/schedules/${getValues('subsidiary_id')}/${info.startStr}/${info.endStr}`, { signal: controller.signal })
-                    .then(response => {
-                      let events = response.data.map(schedule => ({
-                        title: schedule.title,
-                        start: new Date(schedule.date_time).toISOString(),
-                        end: new Date(new Date(schedule.date_time).getTime() + 1.2e+6).toISOString(),
-                      }));
-                      successCallback(events);
-                    })
-                    .catch(error => failureCallback(error));
-                }}
+                events={getEvents}
                 businessHours={[
                   {
                     daysOfWeek: [1, 2, 3, 4, 5],
@@ -186,7 +219,7 @@ export default function Agenda() {
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 dateClick={handleDateClick}
                 eventClick={handleEventClick}
-                datesSet={handleDatesSet}
+                datesSet={({ view }) => setView(view)}
                 weekends={false}
                 eventOverlap={false}
                 slotEventOverlap={false}
@@ -216,38 +249,33 @@ export default function Agenda() {
           <Modal.Title>Novo Agendamento</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            <Form.Control defaultValue="0" className="mb-3" as="select" {...register('person_id', { required: true })}>
-              <option disabled value="0">Cliente</option>
-              {people.map(person => <option key={person.id} value={person.id}>{person.name}</option>)}
-            </Form.Control>
+          <FormProvider {...methods}>
+            <Tabs defaultActiveKey="client" id="schedule-tabs" className="mb-4">
+              <Tab eventKey="client" title="Dados do Cliente">
+                <Form onSubmit={methods.handleSubmit(onSubmit, onSubmitError)} id="modalForm">
+                  <PersonFields action={action} />
+                  <hr />
+                  <Form.Control className="mb-3" as="textarea" placeholder="Descrição" {...methods.register('description')} />
+                  <Form.Control className="mb-3" as="textarea" placeholder="Observação" {...methods.register('observation')} />
 
-            <Form.Control defaultValue="0" className="mb-3" as="select" {...register('user_id', { required: true })}>
-              <option disabled value="0">Usuário</option>
-              {users.map(user => <option key={user.id} value={user.id}>{user.name}</option>)}
-            </Form.Control>
-
-            {/* <Form.Control className="mb-3" as="select">
-              <option disabled value="0">Filial</option>
-              {subsidiaries.map(sub => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
-            </Form.Control> */}
-
-            <Form.Control defaultValue="0" className="mb-3" as="select" {...register('schedule_type', { required: true })}>
-              <option disabled value="0">Tipo de Agendamento</option>
-              <option value="A">Agendamento</option>
-              <option value="R">Reserva de Horário</option>
-              <option value="P">Pré-agendamento</option>
-            </Form.Control>
-
-            <Form.Control className="mb-3" as="textarea" placeholder="Descrição" {...register('description')} />
-            <Form.Control className="mb-3" as="textarea" placeholder="Observação" {...register('observation')} />
-          </Form>
+                  {/* <hr />
+                  <Form.Control defaultValue="0" as="select" {...methods.register('sale.product_id')}>
+                    <option value="0">Selecione o produto</option>
+                    {products.map(product => <option key={product.id} value={product.id}>{product.name}</option>)}
+                  </Form.Control> */}
+                </Form>
+              </Tab>
+              <Tab eventKey="payment" title="Dados do Pagamento" disabled>
+                <Form.Control />
+              </Tab>
+            </Tabs>
+          </FormProvider>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={closeModal}>
             Cancelar
           </Button>
-          <Button variant="primary" onClick={closeModal}>
+          <Button type="submit" variant="primary" form="modalForm">
             Salvar Agendamento
           </Button>
         </Modal.Footer>

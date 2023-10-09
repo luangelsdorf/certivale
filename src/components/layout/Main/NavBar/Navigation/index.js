@@ -42,7 +42,7 @@ export default function Navigation({ children }) {
 
       <NavBarItem toggleAs={Nav.Link} title="Comercial">
         <NavBarItem className="dropdown-item" href="/comercial/dashboard">Painel de Controle</NavBarItem>
-        <NavBarItem className="dropdown-item" href="/comercial/cliente">Cliente</NavBarItem>
+        <NavBarItem className="dropdown-item" href="/comercial/clientes">Clientes</NavBarItem>
         <NavBarItem submenu toggleAs={Dropdown.Item} title="Relatórios" className="dropdown-submenu">
           <NavBarItem className="dropdown-item" href="/comercial/relatorios/renovacao">Renovação</NavBarItem>
           <NavBarItem className="dropdown-item" href="/comercial/relatorios/bonificacao">Bonificação</NavBarItem>
@@ -80,7 +80,6 @@ export default function Navigation({ children }) {
       <NavBarItem toggleAs={Nav.Link} title="Administrativo">
         <NavBarItem className="dropdown-item" href="/administrativo/filiais">Filiais</NavBarItem>
         <NavBarItem className="dropdown-item" href="/administrativo/usuarios">Usuários</NavBarItem>
-        {/* <NavBarItem className="dropdown-item" href="/administrativo/pessoas">Pessoas</NavBarItem> */}
         <NavBarItem className="dropdown-item" href="/administrativo/produtos">Produtos</NavBarItem>
         <NavBarItem className="dropdown-item" href="/administrativo/configurações">Configurações</NavBarItem>
       </NavBarItem>

@@ -28,7 +28,7 @@ export default function Contacts({ content }) {
               <Form.Row>
                 <Col sm="5">
                   <Form.Control as="select" defaultValue="0" {...register(`person.contacts.${index}.contact_type_id`)}>
-                    <option disabled value="0">Tipo de Contato</option>
+                    <option disabled value="0">Tipo</option>
                     <option value="1">Celular</option>
                     <option value="2">Telefone</option>
                     <option value="3">E-mail</option>
