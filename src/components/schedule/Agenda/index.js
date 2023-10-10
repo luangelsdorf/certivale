@@ -25,6 +25,7 @@ export default function Agenda() {
   const [subsidiaryId, setSubsidiaryId] = useState('0');
 
   const [loading, setLoading] = useState(false);
+  const [successCount, setSuccessCount] = useState(0);
 
   const closeModal = () => setIsModalOpen(false);
   const showModal = () => setIsModalOpen(true);
@@ -126,7 +127,7 @@ export default function Agenda() {
       return successCallback(fcRef?.current?.calendar?.getEvents());
     } */
     /* console.log('submitCount:', methods.formState.submitCount); */
-  }, [api, subsidiaryId, methods.formState.submitCount]);
+  }, [api, subsidiaryId, methods.formState.submitCount, successCount]);
 
   function onSubmit(data) {
     let isDirty = !!Object.keys(methods.formState.dirtyFields).length;
@@ -142,8 +143,7 @@ export default function Agenda() {
     let representativeData = data.representative;
 
     if (!isDirty) {
-      api.post(`/schedules/`, { ...bodyBase, schedule_type: 'R' });
-      console.log('%cPOST reserva de horário', 'color: cyan');
+      api.post(`/schedules/`, { ...bodyBase, schedule_type: 'R' })
       return;
     }
 
@@ -153,12 +153,24 @@ export default function Agenda() {
       let { contact, address, ...personBody } = data?.person?.person_type === 'F' ? clientData : representativeData;
       let [year, month, day] = personBody.birth_date.split('-');
       personBody.birth_date = `${day}-${month}-${year}`;
-      console.log('%cPOST pré-agendamento', 'color: orchid');
       api.post(`/people/`, personBody)
         .then(res => { api.post(`/people/${res.data.id}/contact`, { contact_type_id: contact.phone.length > 14 ? '1' : '2', value: contact.phone }); return res; })
         .then(res => { api.post(`/people/${res.data.id}/contact`, { contact_type_id: '3', value: contact.email }); return res; })
         .then(res => { api.post(`/people/${res.data.id}/address`, address); return res; })
-        .then(res => api.post(`/schedules/`, { ...bodyBase, person_id: res.data.id, schedule_type: 'P' }));
+        .then(res => {
+          if (data?.person?.person_type === 'F') {
+            api.post(`/schedules/`, { ...bodyBase, person_id: res.data.id, schedule_type: 'P' })
+              .then(() => setSuccessCount(prev => prev +1));
+          } else {
+            let { contact, address, ...personBody } = clientData;
+            api.post(`/people/`, { ...personBody, county_registration: '0', state_registration: '0', representative_id: res.data.id })
+              .then(res => { api.post(`/people/${res.data.id}/contact`, { contact_type_id: contact.phone.length > 14 ? '1' : '2', value: contact.phone }); return res; })
+              .then(res => { api.post(`/people/${res.data.id}/contact`, { contact_type_id: '3', value: contact.email }); return res; })
+              .then(res => { api.post(`/people/${res.data.id}/address`, address); return res; })
+              .then(res => api.post(`/schedules/`, { ...bodyBase, person_id: res.data.id, schedule_type: 'P' }))
+              .then(() => setSuccessCount(prev => prev +1));
+          }
+        });
     }
   }
 
