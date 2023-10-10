@@ -33,9 +33,10 @@ export default function Agenda() {
 
   const methods = useForm();
 
+  const watchPersonType = methods.watch('person.person_type');
+
   /* const watchFields = methods.watch();
   console.log(watchFields); */
-
 
   function handleNavigation({ currentTarget: { dataset } }) {
     let fc = fcRef.current;
@@ -111,17 +112,16 @@ export default function Agenda() {
 
   const getEvents = useCallback((info, successCallback, failureCallback) => {
     /* if (methods.formState.isValid) { */
-      api.get(`/schedules/${subsidiaryId}/${info.startStr}/${info.endStr}`, { signal: controller.signal })
-        .then(response => {
-          let events = response.data.map(schedule => ({
-            title: schedule.title.replace('Horario', 'Horário'),
-            start: new Date(schedule.date_time).toISOString(),
-            end: new Date(new Date(schedule.date_time).getTime() + 1.2e+6).toISOString(),
-          }));
-          console.log(events);
-          successCallback(events);
-        })
-        .catch(error => failureCallback(error));
+    api.get(`/schedules/${subsidiaryId}/${info.startStr}/${info.endStr}`, { signal: controller.signal })
+      .then(response => {
+        let events = response.data.map(schedule => ({
+          title: schedule.title.replace('Horario', 'Horário'),
+          start: new Date(schedule.date_time).toISOString(),
+          end: new Date(new Date(schedule.date_time).getTime() + 1.2e+6).toISOString(),
+        }));
+        successCallback(events);
+      })
+      .catch(error => failureCallback(error));
     /* } else {
       return successCallback(fcRef?.current?.calendar?.getEvents());
     } */
@@ -130,7 +130,6 @@ export default function Agenda() {
 
   function onSubmit(data) {
     let isDirty = !!Object.keys(methods.formState.dirtyFields).length;
-    console.log(`%cis dirty:%c ${isDirty}`, 'color: cyan', 'color: orchid');
 
     let bodyBase = {
       user_id: session.user.id,
@@ -139,34 +138,32 @@ export default function Agenda() {
       date_time: data.date_time,
     }
 
+    let clientData = data.person;
+    let representativeData = data.representative;
+
     if (!isDirty) {
       api.post(`/schedules/`, { ...bodyBase, schedule_type: 'R' });
+      console.log('%cPOST reserva de horário', 'color: cyan');
+      return;
+    }
+
+    if (data?.person?.id) {
+      api.post(`/schedules/`, { ...bodyBase, person_id: data.person.id, schedule_type: 'P' });
     } else {
-      if (data?.person?.id) {
-        api.post(`/schedules/`, { ...bodyBase, person_id: data.person.id, schedule_type: 'P' });
-      } else {
-        let { contacts, addresses, ...personBody } = data.person;
-        let [year, month, day] = personBody.birth_date.split('-');
-        personBody.birth_date = `${day}-${month}-${year}`;
-        api.post(`/people/`, personBody)
-          .then(res => {
-            if (contacts.length) {
-              contacts.forEach(contact => api.post(`/people/${res.data.id}/contact`, contact));
-            }
-            return res;
-          })
-          .then(res => {
-            if (addresses.length) {
-              addresses.forEach(address => api.post(`/people/${res.data.id}/address`, address));
-            }
-            return res;
-          })
-          .then(res => api.post(`/schedules/`, { ...bodyBase, person_id: res.data.id, schedule_type: 'P' }));
-      }
+      let { contact, address, ...personBody } = data?.person?.person_type === 'F' ? clientData : representativeData;
+      let [year, month, day] = personBody.birth_date.split('-');
+      personBody.birth_date = `${day}-${month}-${year}`;
+      console.log('%cPOST pré-agendamento', 'color: orchid');
+      api.post(`/people/`, personBody)
+        .then(res => { api.post(`/people/${res.data.id}/contact`, { contact_type_id: contact.phone.length > 14 ? '1' : '2', value: contact.phone }); return res; })
+        .then(res => { api.post(`/people/${res.data.id}/contact`, { contact_type_id: '3', value: contact.email }); return res; })
+        .then(res => { api.post(`/people/${res.data.id}/address`, address); return res; })
+        .then(res => api.post(`/schedules/`, { ...bodyBase, person_id: res.data.id, schedule_type: 'P' }));
     }
   }
 
   function onSubmitError(errors) {
+    console.log('%cRHF Error', 'color:tomato');
     console.error(errors);
   }
 
@@ -250,25 +247,48 @@ export default function Agenda() {
         </Modal.Header>
         <Modal.Body>
           <FormProvider {...methods}>
-            <Tabs defaultActiveKey="client" id="schedule-tabs" className="mb-4">
-              <Tab eventKey="client" title="Dados do Cliente">
-                <Form onSubmit={methods.handleSubmit(onSubmit, onSubmitError)} id="modalForm">
-                  <PersonFields action={action} />
-                  <hr />
-                  <Form.Control className="mb-3" as="textarea" placeholder="Descrição" {...methods.register('description')} />
-                  <Form.Control className="mb-3" as="textarea" placeholder="Observação" {...methods.register('observation')} />
-
-                  {/* <hr />
-                  <Form.Control defaultValue="0" as="select" {...methods.register('sale.product_id')}>
-                    <option value="0">Selecione o produto</option>
-                    {products.map(product => <option key={product.id} value={product.id}>{product.name}</option>)}
-                  </Form.Control> */}
-                </Form>
-              </Tab>
+            {/* <Tabs defaultActiveKey="client" id="schedule-tabs" className="mb-4">
+              <Tab eventKey="client" title="Dados do Cliente"> */}
+            <Form onSubmit={methods.handleSubmit(onSubmit, onSubmitError)} id="modalForm">
+              <Form.Control className="mb-3" defaultValue="" as="select" {...methods.register('person.person_type')}>
+                <option value="">Selecione o produto</option>
+                {/* {products.map(product => <option key={product.id} value={product.id}>{product.name}</option>)} */}
+                <optgroup label="e-CPF">
+                  <option value="F">e-CPF A1 - 1 Ano</option>
+                  <option value="F">e-CPF A3 - 1 Ano</option>
+                  <option value="F">e-CPF A3 - 2 Anos</option>
+                  <option value="F">e-CPF A3 - 3 Anos</option>
+                </optgroup>
+                <optgroup label="e-CNPJ">
+                  <option value="J">e-CNPJ A1 - 1 Ano</option>
+                  <option value="J">e-CNPJ A3 - 1 Ano</option>
+                  <option value="J">e-CNPJ A3 - 2 Anos</option>
+                  <option value="J">e-CNPJ A3 - 3 Anos</option>
+                </optgroup>
+                <optgroup label="SafeID">
+                  <option value="F">SafeID CPF A3 - 1 Ano</option>
+                  <option value="J">SafeID CNPJ A3 - 1 Ano</option>
+                </optgroup>
+              </Form.Control>
+              <div>
+                {watchPersonType && <h5 className="mt-5 mb-3">Dados do Cliente</h5>}
+                <PersonFields personType={watchPersonType} action={action} />
+              </div>
+              {watchPersonType === 'J' && (
+                <div>
+                  <h5 className="mt-5 mb-3">Dados do Representante</h5>
+                  <PersonFields baseName="representative" personType="F" action={action} />
+                </div>
+              )}
+              {/* <hr />
+              <Form.Control className="mb-3" as="textarea" placeholder="Descrição" {...methods.register('description')} />
+              <Form.Control className="mb-3" as="textarea" placeholder="Observação" {...methods.register('observation')} /> */}
+            </Form>
+            {/* </Tab>
               <Tab eventKey="payment" title="Dados do Pagamento" disabled>
                 <Form.Control />
               </Tab>
-            </Tabs>
+            </Tabs> */}
           </FormProvider>
         </Modal.Body>
         <Modal.Footer>
