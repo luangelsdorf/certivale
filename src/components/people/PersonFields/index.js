@@ -17,17 +17,24 @@ export default function PersonFields({ action, personType, baseName = 'person' }
     let document = getValues(`${baseName}.document`);
     api.get(`/people/${document}/document`)
       .then(res => {
-        res.data.contacts = res.data.contacts.map(el => {
-          return {
-            ...el,
-            contact_type_id: el.type.replace('CELULAR', '1').replace('TELEFONE', '2').replace('EMAIL', '3')
-          }
+        reset({ ...getValues(), [baseName]: res.data }, { keepDefaultValues: true, keepSubmitCount: true, });
+        res.data.contacts.forEach(con => {
+          if (con.type === 'TELEFONE' || con.type === 'CELULAR') setValue(`${baseName}.contact.phone`, con.value);
+          if (con.type === 'EMAIL') setValue(`${baseName}.contact.email`, con.value);
         });
-        reset({ ...getValues(), person: res.data }, { keepDefaultValues: true, keepSubmitCount: true, });
+        methods.setValue(`${person}.address.zip`, res.data.person.addresses[0].zip);
+        methods.setValue(`${person}.address.street`, res.data.person.addresses[0].street);
+        methods.setValue(`${person}.address.number`, res.data.person.addresses[0].number);
+        methods.setValue(`${person}.address.city`, res.data.person.addresses[0].county.name);
+        methods.setValue(`${person}.address.state`, res.data.person.addresses[0].county.state.uf);
+        methods.setValue(`${person}.address.neighborhood`, res.data.person.addresses[0].neighborhood);
+        methods.setValue(`${person}.address.complement`, res.data.person.addresses[0].complement);
         currentTarget?.classList.replace('btn-danger', 'btn-primary');
-        res.data?.addresses?.forEach((address, i) => setValue(`person.addresses.${i}.county_ibge_code`, address.county.ibge_code));
       })
-      .catch(() => currentTarget?.classList.replace('btn-primary', 'btn-danger'))
+      .catch((error) => {
+        console.error(error);
+        currentTarget?.classList.replace('btn-primary', 'btn-danger')
+      })
   }
 
   const isDirty = () => !!Object.keys(formState.dirtyFields).length;

@@ -8,10 +8,14 @@ import ptbrLocale from '@fullcalendar/core/locales/pt-br';
 import { useCallback, useEffect, useRef, useState } from "react";
 import AngleRight from '@icons/angle-right.svg';
 import AngleLeft from '@icons/angle-left.svg';
+import Trash from '@icons/trash.svg';
 import { useSession } from 'next-auth/react';
 import api from 'services/axios';
 import { FormProvider, useForm } from 'react-hook-form';
 import PersonFields from '@/components/people/PersonFields';
+import { formatPerson } from '@/utils/people';
+import withReactContent from 'sweetalert2-react-content';
+import Swal from 'sweetalert2';
 
 export default function Agenda() {
   const fcRef = useRef(null);
@@ -30,9 +34,32 @@ export default function Agenda() {
   const closeModal = () => setIsModalOpen(false);
   const showModal = () => setIsModalOpen(true);
 
-  const controller = new AbortController();
+  const DeleteConfirmation = withReactContent(Swal);
 
-  const methods = useForm();
+  const methods = useForm({
+    id: '',
+    date_time: '',
+    person: {
+      id: '',
+      person_type: '',
+      document: '',
+      name: '',
+      birth_date: '',
+      fantasy_name: '',
+      address: {},
+      contact: {},
+    },
+    representative: {
+      id: '',
+      person_type: '',
+      document: '',
+      name: '',
+      birth_date: '',
+      fantasy_name: '',
+      address: {},
+      contact: {},
+    },
+  });
 
   const watchPersonType = methods.watch('person.person_type');
 
@@ -61,12 +88,23 @@ export default function Agenda() {
     let monthDay = info.date.getDate().toString().padStart(2, '0');
     let time = info.date.toLocaleTimeString();
     let dateTime = `${year}-${month}-${monthDay}T${time}`;
-    console.log(dateTime);
     methods.setValue('date_time', dateTime);
   }
 
   function handleEventClick(info) {
-    console.log(info);
+    api.get(`/schedules/${info.event.id}`)
+      .then(res => {
+        setAction({ method: 'put', text: 'Editar' })
+        if (res.data.person) {
+          formatPerson(methods, res.data.person);
+          methods.setValue('id', res.data.id);
+        } else {
+          methods.reset(undefined, { keepDefaultValues: true, keepSubmitCount: true });
+          methods.setValue('id', res.data.id);
+        }
+        showModal();
+      })
+      .catch(error => console.error(error));
   }
 
   /*** Initial Data ***/
@@ -113,9 +151,10 @@ export default function Agenda() {
 
   const getEvents = useCallback((info, successCallback, failureCallback) => {
     /* if (methods.formState.isValid) { */
-    api.get(`/schedules/${subsidiaryId}/${info.startStr}/${info.endStr}`, { signal: controller.signal })
+    api.get(`/schedules/${subsidiaryId}/${info.startStr}/${info.endStr}`)
       .then(response => {
         let events = response.data.map(schedule => ({
+          id: schedule.id,
           title: schedule.title.replace('Horario', 'Horário'),
           start: new Date(schedule.date_time).toISOString(),
           end: new Date(new Date(schedule.date_time).getTime() + 1.2e+6).toISOString(),
@@ -160,7 +199,7 @@ export default function Agenda() {
         .then(res => {
           if (data?.person?.person_type === 'F') {
             api.post(`/schedules/`, { ...bodyBase, person_id: res.data.id, schedule_type: 'P' })
-              .then(() => setSuccessCount(prev => prev +1));
+              .then(() => setSuccessCount(prev => prev + 1));
           } else {
             let { contact, address, ...personBody } = clientData;
             api.post(`/people/`, { ...personBody, county_registration: '0', state_registration: '0', representative_id: res.data.id })
@@ -168,7 +207,7 @@ export default function Agenda() {
               .then(res => { api.post(`/people/${res.data.id}/contact`, { contact_type_id: '3', value: contact.email }); return res; })
               .then(res => { api.post(`/people/${res.data.id}/address`, address); return res; })
               .then(res => api.post(`/schedules/`, { ...bodyBase, person_id: res.data.id, schedule_type: 'P' }))
-              .then(() => setSuccessCount(prev => prev +1));
+              .then(() => setSuccessCount(prev => prev + 1));
           }
         });
     }
@@ -307,11 +346,35 @@ export default function Agenda() {
           <Button variant="secondary" onClick={closeModal}>
             Cancelar
           </Button>
+          {action.text === 'Editar' && (
+            <Button className="btn-icon-only mr-auto" variant="danger" onClick={() => {
+              closeModal();
+              DeleteConfirmation.fire({
+                title: 'Deseja excluir este agendamento?',
+                text: 'Esta ação é irreversível.',
+                icon: 'warning',
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: 'Excluir',
+                cancelButtonText: 'Cancelar',
+                customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-secondary' },
+                allowEscapeKey: true,
+              })
+                .then(result => {
+                  if (result.isConfirmed) {
+                    api.delete(`/schedules/${methods.getValues('id')}`)
+                      .then(() => setSuccessCount(prev => prev + 1))
+                  }
+                })
+            }}>
+              <Trash />
+            </Button>
+          )}
           <Button type="submit" variant="primary" form="modalForm">
-            Salvar Agendamento
+            Salvar
           </Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </div >
   )
 }
