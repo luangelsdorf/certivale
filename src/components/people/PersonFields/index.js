@@ -5,6 +5,7 @@ import Addresses from '../Addresses';
 import Contacts from '../Contacts';
 import Search from '@icons/magnifying-glass.svg';
 import api from 'services/axios';
+import { maskCNPJ, maskCPF } from '@/utils/mask';
 
 export default function PersonFields({ action, personType, baseName = 'person' }) {
   const { register, getValues, setValue, watch, reset, formState } = useFormContext();
@@ -14,7 +15,7 @@ export default function PersonFields({ action, personType, baseName = 'person' }
 
   function fillFields(e) {
     let currentTarget = e.currentTarget;
-    let document = getValues(`${baseName}.document`);
+    let document = getValues(`${baseName}.document`).replace(/[^0-9]/g, '');
     api.get(`/people/${document}/document`)
       .then(res => {
         reset({ ...getValues(), [baseName]: res.data }, { keepDefaultValues: true, keepSubmitCount: true, });
@@ -48,7 +49,12 @@ export default function PersonFields({ action, personType, baseName = 'person' }
               <Form.Control
                 className="mb-3"
                 placeholder={personType === 'F' ? 'CPF' : 'CNPJ'}
-                {...register(`${baseName}.document`, { required: isDirty(), })}
+                {...register(`${baseName}.document`, {
+                  required: isDirty(),
+                  onChange: ({ target }) => {
+                    setValue(target.name, personType === 'F' ? maskCPF(target.value) : maskCNPJ(target.value));
+                  },
+                })}
               />
               <Button className="btn-icon-only flex-shrink-0" onClick={fillFields}>
                 <Search />

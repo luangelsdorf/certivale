@@ -3,6 +3,7 @@ import styles from './Addresses.module.scss';
 import { Col, Form, Spinner } from 'react-bootstrap';
 import { useSession } from 'next-auth/react';
 import cep from '@/utils/cep';
+import { maskCEP } from '@/utils/mask';
 
 export default function Addresses({ baseName = 'person' }) {
   const { register, getValues, setValue, watch, } = useFormContext();
@@ -30,7 +31,15 @@ export default function Addresses({ baseName = 'person' }) {
       <div className="position-relative">
         <Form.Row>
           <Col>
-            <Form.Control minLength="8" maxLength="9" placeholder="CEP" className="mb-2" {...register(`${baseName}.address.zip`, { required: true, onBlur: () => getCep() })} />
+            <Form.Control
+              placeholder="CEP"
+              className="mb-2"
+              {...register(`${baseName}.address.zip`, {
+                required: true,
+                onBlur: () => getCep(),
+                onChange: e => setValue(e.target.name, maskCEP(e.target.value)),
+              })}
+            />
           </Col>
           {/* <Col sm="auto" className="d-flex align-items-center mb-2">
             <Spinner variant="primary" animation="border" />
