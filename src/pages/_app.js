@@ -1,6 +1,7 @@
 import 'src/styles/theme/purpose.scss';
 import localFont from 'next/font/local';
 import MainLayout from '@/components/layout/Main';
+import BasicLayout from '@/components/layout/Basic';
 import { SessionProvider } from 'next-auth/react';
 import { useRouter } from 'next/router';
 
@@ -21,7 +22,9 @@ export default function App({ Component, pageProps: { session, ...pageProps } })
       <SessionProvider refetchOnWindowFocus={false} session={session}>
         {
           Component.showLayout === false || router.pathname === '/_error' || router.pathname === '/404' ? (
-            <Component {...pageProps} />
+            <BasicLayout pageTitle={Component.Title}>
+              <Component {...pageProps} />
+            </BasicLayout>
           ) : (
             <MainLayout pageTitle={Component.Title}>
               <Component {...pageProps} />

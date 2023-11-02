@@ -51,13 +51,13 @@ export default function UserMenu({ content }) {
   const shouldShowSidebar = () => !(localStorage.getItem('cvSidenavShow') === 'true') ?? true;
 
   const NotificationCard = ({ n }) => (
-    <div class="d-flex align-items-center">
+    <div className="d-flex align-items-center">
       <div>
-        <span class={`avatar bg-${n.color} text-white rounded-circle`}>{n.profile}</span>
+        <span className={`avatar bg-${n.color} text-white rounded-circle`}>{n.profile}</span>
       </div>
-      <div class="flex-fill ml-3">
-        <div class="h6 text-sm mb-0">{n.name} <small class="float-right text-muted">{n.time}</small></div>
-        <p class="text-sm lh-140 mb-0">
+      <div className="flex-fill ml-3">
+        <div className="h6 text-sm mb-0">{n.name} <small className="float-right text-muted">{n.time}</small></div>
+        <p className="text-sm lh-140 mb-0">
           {n.text}
         </p>
       </div>

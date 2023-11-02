@@ -42,7 +42,20 @@ const authHandler = NextAuth({
       session.token = token.token;
       return session;
     },
-  }
+    async redirect({ baseUrl, url }) {
+      const redirectUrl = decodeURIComponent(url);
+      const callbackIndex = redirectUrl.indexOf('callbackUrl=');
+      if (callbackIndex > -1) {
+        const callbackPath = redirectUrl.slice(callbackIndex + 12);
+        return callbackPath.includes(baseUrl) ? callbackPath : baseUrl + callbackPath;
+      }
+      return url;
+    },
+  },
+
+  pages: {
+    signIn: '/auth/login',
+  },
 });
 
 export default async function handler(...params) {

@@ -66,6 +66,27 @@
 select.form-control:has(:first-child:checked) {
   color: $input-placeholder-color;
 }
+.input-group > .form-control {
+  z-index: 1;
+}
+.input-group-prepend {
+  margin-right: 0;
+}
+.input-group-merge {
+  .input-group-text {
+    border-right: 0;
+  }
+}
+.input-group:focus-within .input-group-text {
+  color: $input-group-addon-focus-color;
+  background-color: $input-group-addon-focus-bg;
+  border-color: $input-group-addon-focus-border-color;
+}
+.input-group-merge:focus-within .input-group-text {
+  color: $input-group-addon-focus-color;
+  background-color: inherit;
+  border-color: $input-group-addon-focus-border-color;
+}
 
 // => Navbar
 .navbar-nav .nav-link {
