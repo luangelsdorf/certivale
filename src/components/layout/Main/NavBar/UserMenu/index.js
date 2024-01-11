@@ -5,7 +5,7 @@ import Search from '@icons/magnifying-glass.svg';
 import Bell from '@icons/bell.svg';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 
 export default function UserMenu({ content }) {
   const notifications = [
@@ -121,7 +121,7 @@ export default function UserMenu({ content }) {
           <Dropdown.Item href="#" as={Link}>Configurações</Dropdown.Item>
           <Dropdown.Item href="#" as={Link}>Atividade</Dropdown.Item>
           <Dropdown.Divider />
-          <Dropdown.Item href="#" as={Link}>Sair</Dropdown.Item>
+          <Dropdown.Item href="#" onClick={signOut} as={'button'}>Sair</Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
     </Nav>

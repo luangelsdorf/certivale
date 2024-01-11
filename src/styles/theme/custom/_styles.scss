@@ -40,6 +40,10 @@
   }
 }
 
+.application .main-content {
+  min-height: 100vh;
+}
+
 // => Actions
 .action-item {
   display: inline-flex;

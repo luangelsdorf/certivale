@@ -38,7 +38,7 @@ const authHandler = NextAuth({
       return { ...user, ...token };
     },
     async session({ session, token }) {
-      session.user = token.usuario;
+      session.user = token.user;
       session.token = token.token;
       return session;
     },

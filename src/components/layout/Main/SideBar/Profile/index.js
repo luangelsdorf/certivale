@@ -17,7 +17,7 @@ export default function Profile({ content }) {
         </a>
         <div className="mt-4">
           <h5 className="mb-0 text-white">{(session?.user?.name ?? session?.user?.nome)?.split(' ')[0]}</h5>
-          {/* <span className="d-block text-sm text-white opacity-8">Diretora Operacional</span> */}
+          <span className="d-block text-sm text-white opacity-8">Gerente de Marketing</span>
         </div>
       </div>
 
