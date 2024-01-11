@@ -49,3 +49,12 @@ export function maskCEP(CEP) {
     .replace(/^(\d{5})(\d{3})/, "$1-$2")
     .replace(/(-\d{3})\d+?$/, "$1");
 };
+
+export function maskMoney(value) {
+  value = value.replace('.', '').replace(',', '').replace(/\D/g, '')
+
+  const formatter = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 });
+  const result = formatter.format(parseFloat(value) / 100);
+  
+  return 'R$ ' + result;
+}
